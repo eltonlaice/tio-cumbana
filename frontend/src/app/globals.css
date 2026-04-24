@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sisal: #F5EDD9;
+  --color-ocre: #D4A24C;
+  --color-terracota: #9F3E26;
+  --color-terracota-deep: #7E2F1C;
+  --color-verde-capim: #3D5A3A;
+  --color-preto-terra: #1A1410;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-sans: var(--font-albert-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
