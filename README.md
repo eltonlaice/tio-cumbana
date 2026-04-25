@@ -31,6 +31,7 @@ A digital agronomist that:
 1. **Watches each parcel** — a long-running Managed Agent (per farmer) cross-references photos, weather, and market prices, and decides autonomously whether to interrupt.
 2. **Remembers each farmer** — crops, planting dates, preferences, history. Two farmers asking the same question receive two different answers because they are two different people.
 3. **Speaks in a familiar voice** — Portuguese with Changana code-switching, delivered as a voice note in the builder's cloned voice. In Maluana, people already call me Tio Cumbana.
+4. **Gets smarter as more farmers contribute** — Mozambique has no public real-time feed for wholesale prices. So we made the farmers the feed: when Dona Maria walks to Mercado do Zimpeto, she contributes what she saw; the next farmer about to make the same trip gets her data, plus everyone else's. Agronomy is relational; market intelligence is too.
 
 ## Anthropic platform — what's wired and where
 
@@ -44,6 +45,7 @@ A single coherent stack of Claude Code / Claude API capabilities; not a checklis
 | Claude Managed Agents (vigilance loop) | [`backend/app/services/managed_agent.py`](backend/app/services/managed_agent.py) |
 | Agent SDK toolset (`agent_toolset_20260401`) | Same module |
 | MCP server (weather feed for the agent) | [`mcp_servers/weather/`](mcp_servers/weather/) |
+| MCP server (Zimpeto price pool) | [`mcp_servers/market_prices/`](mcp_servers/market_prices/) |
 | Agent Skill (reusable diagnostic skill) | [`skills/diagnose-mildew/`](skills/diagnose-mildew/) |
 
 Architecture, design choices, and what was deliberately scoped out: see [`DEVELOPMENT.md`](DEVELOPMENT.md) and [`docs/architecture.md`](docs/architecture.md).

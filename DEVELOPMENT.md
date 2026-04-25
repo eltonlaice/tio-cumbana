@@ -13,7 +13,7 @@ The commit log is the development trajectory. Every commit is co-authored by Cla
 | **Sub-agents** (Explore, Plan, code-reviewer) | Used at session-time | Explore mapped the Anthropic docs to confirm Messages API does **not** accept audio content blocks today (Apr 2026), forcing the STT bridge. Plan agent shaped the Managed Agents stub. |
 | **Claude Managed Agents** | [`backend/app/services/managed_agent.py`](backend/app/services/managed_agent.py) | The autonomous per-parcel vigilance loop. Uses `client.beta.agents.create` + `beta.environments.create` + `beta.sessions.events.stream` with the `managed-agents-2026-04-01` beta header. Feature-flagged for the demo. |
 | **Agent SDK toolset** | Same module | The Managed Agent is provisioned with `agent_toolset_20260401`, giving it the full pre-built tool set (bash, file, web). |
-| **MCP servers** | [`mcp_servers/weather/`](mcp_servers/weather/) | A FastMCP server exposing `get_weather(latitude, longitude)` to the vigilance agent. Backed by Open-Meteo (no API key) with a built-in mildew-risk heuristic. |
+| **MCP servers** | [`mcp_servers/weather/`](mcp_servers/weather/), [`mcp_servers/market_prices/`](mcp_servers/market_prices/) | Two FastMCP servers. **Weather** exposes `get_weather(lat, lon)` (Open-Meteo) with a mildew-risk heuristic. **Market prices** is a read/write proxy over the community pool — `get_zimpeto_prices(crop)`, `list_zimpeto_market()`, `contribute_price(...)`. |
 | **Agent Skills** | [`skills/diagnose-mildew/`](skills/diagnose-mildew/) | A reusable diagnostic skill with `SKILL.md` + treatment reference. Memory-aware (respects per-farmer product preferences). |
 
 ## Sub-agents used during this build

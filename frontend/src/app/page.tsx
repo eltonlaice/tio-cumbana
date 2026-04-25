@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -138,14 +139,22 @@ export default function Home() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col">
-      <header className="border-b border-preto-terra/20 px-5 py-5">
-        <h1 className="font-display text-4xl leading-none tracking-tight">
-          Tio{" "}
-          <em className="italic font-normal text-terracota">Cumbana</em>
-        </h1>
-        <p className="mt-1 text-[11px] uppercase tracking-[0.25em] text-verde-capim">
-          Agronomia relacional
-        </p>
+      <header className="flex items-end justify-between border-b border-preto-terra/20 px-5 py-5">
+        <div>
+          <h1 className="font-display text-4xl leading-none tracking-tight">
+            Tio{" "}
+            <em className="italic font-normal text-terracota">Cumbana</em>
+          </h1>
+          <p className="mt-1 text-[11px] uppercase tracking-[0.25em] text-verde-capim">
+            Agronomia relacional
+          </p>
+        </div>
+        <Link
+          href="/market"
+          className="text-[11px] uppercase tracking-[0.2em] text-terracota hover:underline"
+        >
+          Mercado →
+        </Link>
       </header>
 
       <section className="px-5 py-4">
