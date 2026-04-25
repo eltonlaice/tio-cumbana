@@ -33,6 +33,30 @@ A digital agronomist that:
 3. **Speaks in a familiar voice** — Portuguese with Changana code-switching, delivered as a voice note in the builder's cloned voice. In Maluana, people already call me Tio Cumbana.
 4. **Gets smarter as more farmers contribute** — Mozambique has no public real-time feed for wholesale prices. So we made the farmers the feed: when Dona Maria walks to Mercado do Zimpeto, she contributes what she saw; the next farmer about to make the same trip gets her data, plus everyone else's. Agronomy is relational; market intelligence is too.
 
+## Across the value chain
+
+Most agritech solves one node — Plantix does diagnosis, market apps do prices, ERPs do paperwork. Tio Cumbana spans the chain because it's anchored in the farmer's *relationship*, and that relationship touches every node naturally.
+
+```
+   plant         grow           harvest         wholesale       retail        consumer
+   ─────         ────           ───────         ─────────       ──────        ────────
+   memory   →   vigilance   →   phenology   →   price pool  →   supermarket   QR-origin
+   + market     + weather       + market        + Zimpeto       pipeline +    label →
+   signals      + disease       spikes          aggregation     pre-orders    farmer
+                                                                              profile
+```
+
+| Node | What Tio Cumbana does |
+|---|---|
+| **Pre-production** | Memory + market signals advise *what* to plant this cycle |
+| **Production** | Managed Agent vigilance — weather, disease, dosages, suppliers |
+| **Post-production** | Phenological tracking + market-spike alerts ("sell this week") |
+| **Wholesale** | Community price pool — Zimpeto wholesale visible without the middleman's lens |
+| **Retail** | Aggregated harvest pipeline gives supermarkets pre-purchase contracts and lower receiving waste; origin labelling at shelf level |
+| **Consumer** | QR on the produce → the farmer's profile and the parcel's history |
+
+A unified layer that knows Dona Maria from the seed she chose to the shelf where her cucumber lands has not been economically viable until now — a human agronomist costs hundreds of dollars per farmer per season; an Opus 4.7-powered agent on Managed Agents costs cents per farmer per day. This is the "Build For What's Next" half of the brief: the workflow only exists once the tools change.
+
 ## Anthropic platform — what's wired and where
 
 A single coherent stack of Claude Code / Claude API capabilities; not a checklist.
