@@ -20,6 +20,10 @@ class Settings(BaseSettings):
 
     claude_model: str = "claude-opus-4-7"
 
+    use_managed_agent: bool = False
+    managed_agent_id: str = ""
+    managed_environment_id: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

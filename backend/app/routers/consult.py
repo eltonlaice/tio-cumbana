@@ -11,8 +11,11 @@ from app.models.schemas import (
     ProactiveRequest,
     ProactiveResponse,
 )
+from anthropic import AsyncAnthropic
+
 from app.services.anthropic_client import TioCumbanaLLM
 from app.services.farmer_context import load_farmer
+from app.services.managed_agent import TioCumbanaManagedAgent
 from app.services.stt import ElevenLabsScribe
 from app.services.tts import ElevenLabsTTS
 
@@ -75,7 +78,28 @@ async def proactive(
     settings: Settings = Depends(get_settings),
 ) -> ProactiveResponse:
     farmer = await load_farmer(req.farmer_phone)
-    text = await _llm(settings).proactive(farmer=farmer, trigger=req.trigger)
+
+    if settings.use_managed_agent and settings.managed_agent_id:
+        # Production path: a long-running Managed Agent decides whether to
+        # interrupt and what to say. See services/managed_agent.py.
+        ma_client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+        ma = TioCumbanaManagedAgent(
+            ma_client,
+            settings.managed_agent_id,
+            settings.managed_environment_id,
+        )
+        snapshot = {"trigger": req.trigger}  # real impl: weather, prices, photo URLs
+        decision = await ma.tick(farmer, snapshot)
+        if decision.action != "message" or not decision.content:
+            return ProactiveResponse(
+                text=f"(no_action: {decision.reason or 'silent'})",
+                farmer=farmer,
+                trigger=req.trigger,
+            )
+        text = decision.content
+    else:
+        # Demo path (default): scripted single-shot generation.
+        text = await _llm(settings).proactive(farmer=farmer, trigger=req.trigger)
 
     audio_b64: str | None = None
     if settings.elevenlabs_voice_id:
