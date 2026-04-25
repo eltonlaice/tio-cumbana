@@ -34,10 +34,9 @@ class TwilioWhatsApp:
     def __init__(self, account_sid: str, auth_token: str, sender: str):
         if not (account_sid and auth_token and sender):
             raise ValueError("TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM are required")
-        if not sender.startswith("whatsapp:"):
-            raise ValueError("TWILIO_WHATSAPP_FROM must be in the form 'whatsapp:+E164'")
         self.client = Client(account_sid, auth_token)
-        self.sender = sender
+        # Accept either "whatsapp:+14155238886" or just "+14155238886" — normalise.
+        self.sender = sender if sender.startswith("whatsapp:") else f"whatsapp:{sender}"
 
     def send_voice_note(self, to: str, body: str, media_url: str | None = None) -> str:
         if not to.startswith("whatsapp:"):
