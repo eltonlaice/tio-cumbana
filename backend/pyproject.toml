@@ -17,6 +17,8 @@ dependencies = [
     "elevenlabs>=1.9",
     "supabase>=2.9",
     "structlog>=24.4",
+    "twilio>=9.0",
+    "boto3>=1.35",
 ]
 
 [project.optional-dependencies]

@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     managed_agent_id: str = ""
     managed_environment_id: str = ""
 
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_whatsapp_from: str = ""  # e.g. whatsapp:+14155238886
+    mother_whatsapp_to: str = ""  # demo destination — same E.164 + whatsapp: prefix
+
+    aws_region: str = "eu-west-1"
+    audio_bucket: str = ""  # optional — if set, voice notes are uploaded here for Twilio media_url
+
 
 @lru_cache
 def get_settings() -> Settings:

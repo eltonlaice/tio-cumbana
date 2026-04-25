@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import base64
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 import structlog
 
 from app.config import Settings, get_settings
@@ -13,11 +13,13 @@ from app.models.schemas import (
 )
 from anthropic import AsyncAnthropic
 
+from app.services import audio_cache
 from app.services.anthropic_client import TioCumbanaLLM
 from app.services.farmer_context import load_farmer
 from app.services.managed_agent import TioCumbanaManagedAgent
 from app.services.stt import ElevenLabsScribe
 from app.services.tts import ElevenLabsTTS
+from app.services.whatsapp import TwilioWhatsApp, WhatsAppError
 
 router = APIRouter(prefix="/api", tags=["consult"])
 log = structlog.get_logger(__name__)
@@ -75,6 +77,7 @@ async def consult(
 @router.post("/proactive", response_model=ProactiveResponse)
 async def proactive(
     req: ProactiveRequest,
+    request: Request,
     settings: Settings = Depends(get_settings),
 ) -> ProactiveResponse:
     farmer = await load_farmer(req.farmer_phone)
@@ -102,8 +105,40 @@ async def proactive(
         text = await _llm(settings).proactive(farmer=farmer, trigger=req.trigger)
 
     audio_b64: str | None = None
+    audio_bytes_out: bytes | None = None
+    audio_mime = "audio/mpeg"
     if settings.elevenlabs_voice_id:
-        audio_bytes_out, _mime = await _tts(settings).synthesize(text)
+        audio_bytes_out, audio_mime = await _tts(settings).synthesize(text)
         audio_b64 = base64.b64encode(audio_bytes_out).decode()
+
+    # Send via WhatsApp if Twilio is configured. The voice note is hosted
+    # on this same backend at /api/audio/<id> with a 10-min TTL, so Twilio
+    # can fetch it as the message media.
+    if (
+        audio_bytes_out
+        and settings.twilio_account_sid
+        and settings.twilio_auth_token
+        and settings.twilio_whatsapp_from
+        and settings.mother_whatsapp_to
+    ):
+        try:
+            audio_id = audio_cache.store(audio_bytes_out, audio_mime)
+            base_url = str(request.base_url).rstrip("/")
+            media_url = f"{base_url}/api/audio/{audio_id}"
+            wa = TwilioWhatsApp(
+                settings.twilio_account_sid,
+                settings.twilio_auth_token,
+                settings.twilio_whatsapp_from,
+            )
+            wa.send_voice_note(
+                to=settings.mother_whatsapp_to,
+                body=text,
+                media_url=media_url,
+            )
+            log.info("proactive.whatsapp_sent", to=settings.mother_whatsapp_to)
+        except WhatsAppError as e:
+            # Don't fail the API call if WhatsApp delivery breaks; the
+            # frontend already has audio_b64 to play.
+            log.warning("proactive.whatsapp_skipped", error=str(e))
 
     return ProactiveResponse(text=text, audio_b64=audio_b64, farmer=farmer, trigger=req.trigger)

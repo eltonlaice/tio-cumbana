@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers.audio import router as audio_router
 from app.routers.consult import router as consult_router
 from app.routers.market_prices import router as market_prices_router
 
@@ -15,6 +16,7 @@ app.add_middleware(
 
 app.include_router(consult_router)
 app.include_router(market_prices_router)
+app.include_router(audio_router)
 
 
 @app.get("/health")
