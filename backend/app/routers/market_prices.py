@@ -19,7 +19,7 @@ async def get_all() -> list[MarketPriceSnapshot]:
 @router.get("/{crop}", response_model=MarketPriceSnapshot)
 async def get_one(crop: str) -> MarketPriceSnapshot:
     snap = await svc.snapshot(crop)
-    if snap.sample_size_7d == 0:
+    if snap.sample_size_24h == 0:
         raise HTTPException(status_code=404, detail=f"no price data for {crop}")
     return snap
 

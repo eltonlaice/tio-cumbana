@@ -99,9 +99,12 @@ async def list_recent(limit: int = 20) -> list[MarketPriceUpdate]:
     return sorted(_pool, key=lambda u: u.observed_at, reverse=True)[:limit]
 
 
+CONFIRMATION_QUORUM = 2  # distinct contributors required in window
+
+
 async def snapshot(crop: str, market: str = "Zimpeto") -> MarketPriceSnapshot:
     crop = crop.lower().strip()
-    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
     rows = [u for u in _pool if u.crop == crop and u.market == market and u.observed_at >= cutoff]
     rows.sort(key=lambda u: u.observed_at, reverse=True)
 
@@ -109,30 +112,40 @@ async def snapshot(crop: str, market: str = "Zimpeto") -> MarketPriceSnapshot:
         return MarketPriceSnapshot(
             crop=crop,
             market=market,
-            latest_wholesale=None,
-            latest_retail=None,
-            median_wholesale_7d=None,
-            median_retail_7d=None,
-            sample_size_7d=0,
+            confirmed=False,
+            median_wholesale=None,
+            median_retail=None,
+            min_wholesale=None,
+            max_wholesale=None,
+            min_retail=None,
+            max_retail=None,
+            contributors_24h=0,
+            sample_size_24h=0,
             last_observed_at=None,
-            contributors_7d=0,
         )
 
     ws = [u.price_wholesale for u in rows if u.price_wholesale is not None]
     rs = [u.price_retail for u in rows if u.price_retail is not None]
+    contributors = {u.contributor_phone for u in rows}
     return MarketPriceSnapshot(
         crop=crop,
         market=market,
-        latest_wholesale=rows[0].price_wholesale,
-        latest_retail=rows[0].price_retail,
-        median_wholesale_7d=statistics.median(ws) if ws else None,
-        median_retail_7d=statistics.median(rs) if rs else None,
-        sample_size_7d=len(rows),
+        confirmed=len(contributors) >= CONFIRMATION_QUORUM,
+        median_wholesale=statistics.median(ws) if ws else None,
+        median_retail=statistics.median(rs) if rs else None,
+        min_wholesale=min(ws) if ws else None,
+        max_wholesale=max(ws) if ws else None,
+        min_retail=min(rs) if rs else None,
+        max_retail=max(rs) if rs else None,
+        contributors_24h=len(contributors),
+        sample_size_24h=len(rows),
         last_observed_at=rows[0].observed_at,
-        contributors_7d=len({u.contributor_phone for u in rows}),
     )
 
 
 async def all_snapshots(market: str = "Zimpeto") -> list[MarketPriceSnapshot]:
-    crops = sorted({u.crop for u in _pool if u.market == market})
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    crops = sorted(
+        {u.crop for u in _pool if u.market == market and u.observed_at >= cutoff}
+    )
     return [await snapshot(c, market) for c in crops]

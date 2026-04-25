@@ -14,17 +14,22 @@ const FARMERS = [
 type Snapshot = {
   crop: string;
   market: string;
-  latest_wholesale: number | null;
-  latest_retail: number | null;
-  median_wholesale_7d: number | null;
-  median_retail_7d: number | null;
-  sample_size_7d: number;
+  confirmed: boolean;
+  median_wholesale: number | null;
+  median_retail: number | null;
+  min_wholesale: number | null;
+  max_wholesale: number | null;
+  min_retail: number | null;
+  max_retail: number | null;
+  contributors_24h: number;
+  sample_size_24h: number;
   last_observed_at: string | null;
-  contributors_7d: number;
 };
 
-function fmt(v: number | null): string {
-  return v === null ? "—" : `${v.toFixed(0)}`;
+function range(min: number | null, max: number | null, median: number | null): string {
+  if (median === null) return "—";
+  if (min === null || max === null || min === max) return `${median.toFixed(0)}`;
+  return `${min.toFixed(0)}–${max.toFixed(0)}`;
 }
 
 function timeAgo(iso: string | null): string {
@@ -97,13 +102,13 @@ export default function MarketPage() {
   }
 
   async function confirm(s: Snapshot) {
-    await post(s.crop, s.latest_wholesale, s.latest_retail);
+    await post(s.crop, s.median_wholesale, s.median_retail);
   }
 
   function startEdit(s: Snapshot) {
     setEditing(s.crop);
-    setWsInput(s.latest_wholesale?.toString() ?? "");
-    setRsInput(s.latest_retail?.toString() ?? "");
+    setWsInput(s.median_wholesale?.toString() ?? "");
+    setRsInput(s.median_retail?.toString() ?? "");
   }
 
   async function saveEdit(crop: string) {
@@ -168,11 +173,16 @@ export default function MarketPage() {
           {snaps.map((s) => {
             const isEditing = editing === s.crop;
             return (
-              <li key={s.crop} className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+              <li
+                key={s.crop}
+                className={`rounded-2xl px-4 py-3 shadow-sm ${
+                  s.confirmed ? "bg-white" : "bg-white/60"
+                }`}
+              >
                 <div className="flex items-baseline justify-between">
                   <span className="font-display text-lg capitalize">{s.crop}</span>
                   <span className="text-[10px] uppercase tracking-widest text-preto-terra/50">
-                    {timeAgo(s.last_observed_at)}
+                    {s.confirmed ? "✓ confirmado" : "aguarda confirmação"} · {timeAgo(s.last_observed_at)}
                   </span>
                 </div>
 
@@ -181,12 +191,15 @@ export default function MarketPage() {
                     <div className="mt-1 flex items-baseline gap-4 text-sm">
                       <span>
                         <span className="text-[10px] uppercase tracking-widest text-preto-terra/50">grossista </span>
-                        <span className="font-medium">{fmt(s.latest_wholesale)} MZN/kg</span>
+                        <span className="font-medium">{range(s.min_wholesale, s.max_wholesale, s.median_wholesale)} MZN/kg</span>
                       </span>
                       <span>
                         <span className="text-[10px] uppercase tracking-widest text-preto-terra/50">retalho </span>
-                        <span className="font-medium">{fmt(s.latest_retail)} MZN/kg</span>
+                        <span className="font-medium">{range(s.min_retail, s.max_retail, s.median_retail)} MZN/kg</span>
                       </span>
+                    </div>
+                    <div className="mt-1 text-[10px] uppercase tracking-widest text-preto-terra/40">
+                      {s.contributors_24h} contribuidor{s.contributors_24h === 1 ? "" : "es"} · {s.sample_size_24h} observ{s.sample_size_24h === 1 ? "ação" : "ações"} (24h)
                     </div>
                     <div className="mt-2 flex gap-2">
                       <button

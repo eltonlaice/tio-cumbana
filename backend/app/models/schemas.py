@@ -48,14 +48,23 @@ class MarketPriceUpdate(BaseModel):
 
 
 class MarketPriceSnapshot(BaseModel):
-    """Aggregated view per crop returned to consumers (the agent or the frontend)."""
+    """Aggregated view per crop, computed over a rolling 24h window.
+
+    Single observations are NEVER served as authoritative prices. We require
+    at least two distinct contributors in the last 24h to mark a crop
+    `confirmed`. Until confirmed, the median is still computed but the
+    consumer (agent or UI) should treat it as provisional.
+    """
 
     crop: str
     market: str
-    latest_wholesale: float | None
-    latest_retail: float | None
-    median_wholesale_7d: float | None
-    median_retail_7d: float | None
-    sample_size_7d: int
+    confirmed: bool  # >= 2 distinct contributors in last 24h
+    median_wholesale: float | None
+    median_retail: float | None
+    min_wholesale: float | None
+    max_wholesale: float | None
+    min_retail: float | None
+    max_retail: float | None
+    contributors_24h: int
+    sample_size_24h: int
     last_observed_at: datetime | None
-    contributors_7d: int
