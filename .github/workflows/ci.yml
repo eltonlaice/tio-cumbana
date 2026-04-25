@@ -19,6 +19,7 @@ jobs:
           enable-cache: true
       - run: uv sync --all-extras
       - run: uv run ruff check .
+      - run: uv run mypy app
       - run: uv run pytest -q
 
   mcp-weather:

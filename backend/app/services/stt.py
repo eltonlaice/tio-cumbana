@@ -19,6 +19,10 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
+class STTError(RuntimeError):
+    """Raised when an STT provider fails to transcribe."""
+
+
 class STTProvider(Protocol):
     async def transcribe(self, audio_bytes: bytes, mime_type: str) -> str: ...
 
@@ -38,10 +42,17 @@ class ElevenLabsScribe:
         headers = {"xi-api-key": self.api_key}
         files = {"file": ("audio", audio_bytes, mime_type)}
         data = {"model_id": self.model_id, "language_code": "por"}
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(self.URL, headers=headers, files=files, data=data)
-            resp.raise_for_status()
-            payload = resp.json()
-        text = payload.get("text", "").strip()
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(self.URL, headers=headers, files=files, data=data)
+                resp.raise_for_status()
+                payload = resp.json()
+        except httpx.HTTPStatusError as e:
+            logger.error("stt.http_error", status=e.response.status_code, body=e.response.text[:200])
+            raise STTError(f"ElevenLabs Scribe HTTP {e.response.status_code}") from e
+        except httpx.RequestError as e:
+            logger.error("stt.network_error", error=str(e))
+            raise STTError("ElevenLabs Scribe unreachable") from e
+        text = str(payload.get("text", "")).strip()
         logger.info("stt.transcribed", chars=len(text), model=self.model_id)
         return text

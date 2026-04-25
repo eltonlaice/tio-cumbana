@@ -4,6 +4,7 @@
 
 [![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-1A1410?labelColor=F5EDD9)](https://claude.com/product/claude-code)
 [![Powered by Opus 4.7](https://img.shields.io/badge/Powered%20by-Claude%20Opus%204.7-9F3E26?labelColor=F5EDD9)](https://claude.com/)
+[![CI](https://github.com/eltonlaice/tio-cumbana/actions/workflows/ci.yml/badge.svg)](https://github.com/eltonlaice/tio-cumbana/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3D5A3A?labelColor=F5EDD9)](LICENSE)
 
 Built for *Built with Opus 4.7: a Claude Code hackathon* · April 2026

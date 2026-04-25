@@ -19,6 +19,10 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
+class TTSError(RuntimeError):
+    """Raised when a TTS provider fails to synthesise."""
+
+
 class TTSProvider(Protocol):
     async def synthesize(self, text: str) -> tuple[bytes, str]:
         """Return (audio_bytes, mime_type)."""
@@ -54,9 +58,16 @@ class ElevenLabsTTS:
             "model_id": self.model_id,
             "voice_settings": {"stability": 0.45, "similarity_boost": 0.85},
         }
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            resp = await client.post(url, headers=headers, json=body)
-            resp.raise_for_status()
-            audio = resp.content
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                resp = await client.post(url, headers=headers, json=body)
+                resp.raise_for_status()
+                audio = resp.content
+        except httpx.HTTPStatusError as e:
+            logger.error("tts.http_error", status=e.response.status_code, body=e.response.text[:200])
+            raise TTSError(f"ElevenLabs TTS HTTP {e.response.status_code}") from e
+        except httpx.RequestError as e:
+            logger.error("tts.network_error", error=str(e))
+            raise TTSError("ElevenLabs TTS unreachable") from e
         logger.info("tts.synthesized", bytes=len(audio), voice=self.voice_id)
         return audio, "audio/mpeg"

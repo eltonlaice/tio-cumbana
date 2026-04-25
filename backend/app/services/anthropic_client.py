@@ -12,10 +12,11 @@ Audio is transcribed upstream by `services/stt.py`.
 from __future__ import annotations
 
 import base64
-from typing import Any
+from typing import Any, cast
 
 import structlog
 from anthropic import AsyncAnthropic
+from anthropic.types import MessageParam
 
 from app.models.schemas import FarmerProfile
 from app.prompts.tio_cumbana import build_system_prompt
@@ -57,11 +58,14 @@ class TioCumbanaLLM:
             {"type": "text", "text": user_text},
         ]
 
+        messages: list[MessageParam] = [
+            cast(MessageParam, {"role": "user", "content": content})
+        ]
         resp = await self.client.messages.create(
             model=self.model,
             max_tokens=1024,
             system=build_system_prompt(),
-            messages=[{"role": "user", "content": content}],
+            messages=messages,
         )
         text = "".join(block.text for block in resp.content if block.type == "text").strip()
         logger.info(

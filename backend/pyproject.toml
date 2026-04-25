@@ -25,6 +25,9 @@ dev = [
     "black>=24.10",
     "pytest>=8.3",
     "pytest-asyncio>=0.24",
+    "pytest-cov>=5.0",
+    "mypy>=1.13",
+    "respx>=0.21",
 ]
 
 [build-system]
@@ -45,3 +48,18 @@ target-version = ["py311"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=55"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+exclude = ["tests/"]
+
+# managed_agent.py wires the beta Managed Agents API; the SDK's
+# beta surface is in flux and the strict-mode types around the
+# async stream context manager don't match yet. The runtime path
+# is feature-flagged off for the demo.
+[[tool.mypy.overrides]]
+module = "app.services.managed_agent"
+ignore_errors = true
