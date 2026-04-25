@@ -15,7 +15,9 @@ Elton Laice · Maputo, Mozambique
 
 ## The problem
 
-Smallholder farmers in Lusophone Africa are excluded from agronomy. Extension services don't reach the last mile, private agronomists cost more than a season's profit, and disease, deficiency, or market collapse all show up too late.
+Smallholder farmers — **500 million globally, sustaining 2.5 billion people and producing roughly a third of the world's food** — are largely excluded from agronomy by language, literacy, and the cost of expertise. In Mozambique alone, **3.2 million households** face this gap; across Sub-Saharan Africa, ~33 million.
+
+Extension services don't reach the last mile, private agronomists cost more than a season's profit, and disease, deficiency, or market collapse all show up too late.
 
 I run a 54-row commercial farm in Maluana with my mother — cucumber, bell pepper, seed potato — sandy soil that drinks water in minutes. The nearest agronomist is 40 km away. This is not a hypothetical; it is the use case.
 
