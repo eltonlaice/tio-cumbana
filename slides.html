@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tio Cumbana · Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Albert+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --terracota: #9F3E26;
+    --terracota-deep: #7E2F1C;
+    --verde-capim: #3D5A3A;
+    --ocre: #D4A24C;
+    --sisal: #F5EDD9;
+    --preto-terra: #1A1410;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Albert Sans', sans-serif;
+    background: var(--preto-terra);
+    color: var(--sisal);
+  }
+  .deck { position: relative; width: 100vw; height: 100vh; }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 8vh 10vw;
+    flex-direction: column;
+  }
+  .slide.active { display: flex; }
+  .slide.bg-sisal { background: var(--sisal); color: var(--preto-terra); }
+  .slide.bg-terra { background: var(--preto-terra); color: var(--sisal); }
+  .slide.bg-verde { background: var(--verde-capim); color: var(--sisal); }
+  .slide.bg-terracota { background: var(--terracota); color: var(--sisal); }
+
+  .label {
+    font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.3em; opacity: 0.6;
+    margin-bottom: 24px;
+  }
+  .label.accent { color: var(--ocre); opacity: 1; }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(72px, 12vw, 200px);
+    letter-spacing: -0.035em;
+    line-height: 1;
+    font-variation-settings: "SOFT" 30, "opsz" 144;
+  }
+  .wordmark em {
+    font-style: italic; font-weight: 400;
+    color: var(--terracota);
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+  }
+  .bg-terra .wordmark em, .bg-verde .wordmark em, .bg-terracota .wordmark em {
+    color: var(--ocre);
+  }
+  .tagline {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 13px; text-transform: uppercase;
+    letter-spacing: 0.4em; margin-top: 32px;
+  }
+  .bg-sisal .tagline { color: var(--verde-capim); }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: clamp(48px, 7vw, 110px);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-variation-settings: "SOFT" 50, "opsz" 144;
+    margin-bottom: 32px;
+    max-width: 18ch;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--terracota);
+    font-variation-settings: "SOFT" 100;
+  }
+  .bg-terra h1 em, .bg-verde h1 em, .bg-terracota h1 em { color: var(--ocre); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+    margin-top: 32px;
+    max-width: 1200px;
+  }
+  .stat {
+    border-left: 3px solid var(--ocre);
+    padding-left: 16px;
+  }
+  .stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 4vw, 56px);
+    font-weight: 500;
+    line-height: 1;
+    font-variation-settings: "SOFT" 30;
+  }
+  .stat .lbl {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-top: 8px;
+    opacity: 0.7;
+  }
+
+  .bullets {
+    display: flex; flex-direction: column; gap: 28px;
+    margin-top: 8px;
+    max-width: 26ch;
+  }
+  .bullet {
+    display: flex; gap: 20px; align-items: baseline;
+  }
+  .bullet .n {
+    font-family: 'Fraunces', serif;
+    font-size: 36px; font-style: italic;
+    color: var(--ocre);
+    min-width: 1.2ch;
+    font-variation-settings: "SOFT" 100;
+  }
+  .bullet .t {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(22px, 2.5vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    font-variation-settings: "SOFT" 50;
+  }
+  .bullet .t em {
+    font-style: italic;
+    color: var(--ocre);
+  }
+
+  .closer {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: clamp(36px, 5vw, 80px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-align: center;
+    max-width: 18ch;
+    font-variation-settings: "SOFT" 100, "opsz" 144;
+  }
+
+  .nav {
+    position: absolute; bottom: 24px; right: 32px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.4;
+  }
+
+  .top-id {
+    position: absolute; top: 24px; left: 32px;
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    font-variation-settings: "SOFT" 30;
+  }
+  .top-id em { font-style: italic; color: var(--terracota); }
+  .bg-terra .top-id em, .bg-verde .top-id em, .bg-terracota .top-id em { color: var(--ocre); }
+
+  /* Architecture slide */
+  .arch {
+    width: 100%;
+    max-width: 1300px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 14px 18px;
+    margin-top: 24px;
+    align-items: stretch;
+  }
+  .box {
+    border: 1.5px solid currentColor;
+    padding: 14px 16px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 84px;
+  }
+  .box .head {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .box .body {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    line-height: 1.15;
+    font-variation-settings: "SOFT" 50;
+  }
+  .box .body em { font-style: italic; color: var(--ocre); }
+  .box.solid {
+    background: var(--ocre);
+    color: var(--preto-terra);
+    border-color: var(--ocre);
+  }
+  .box.solid .body em { color: var(--terracota); }
+  .box.span2 { grid-column: span 2; }
+  .box.span3 { grid-column: span 3; }
+  .box.span5 { grid-column: span 5; }
+  .arrow-row {
+    grid-column: span 5;
+    text-align: center;
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.6;
+    padding: 4px 0;
+  }
+
+  /* Value chain slide */
+  .chain {
+    width: 100%;
+    max-width: 1300px;
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+  .chain .actor {
+    display: flex; flex-direction: column;
+    border-top: 3px solid var(--ocre);
+    padding-top: 14px;
+    min-height: 220px;
+  }
+  .chain .stage {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+  .chain .who {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    line-height: 1.05;
+    margin-bottom: 12px;
+    font-variation-settings: "SOFT" 50;
+  }
+  .chain .who em { font-style: italic; color: var(--terracota); }
+  .bg-terra .chain .who em, .bg-verde .chain .who em, .bg-terracota .chain .who em { color: var(--ocre); }
+  .chain .gets {
+    font-family: 'Albert Sans', sans-serif;
+    font-size: 12.5px;
+    line-height: 1.4;
+    opacity: 0.85;
+  }
+  .chain-band {
+    grid-column: span 6;
+    margin-top: 8px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    background: var(--terracota);
+    color: var(--sisal);
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    text-align: center;
+    font-variation-settings: "SOFT" 50;
+  }
+  .chain-band em { font-style: italic; color: var(--ocre); }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- Slide 1: Cover -->
+  <section class="slide bg-sisal active" data-slide="1">
+    <div class="wordmark">Tio <em>Cumbana</em></div>
+    <div class="tagline">An agronomist that watches, remembers, and calls you first</div>
+    <div class="nav">1 · cover</div>
+  </section>
+
+  <!-- Slide 2: Problem -->
+  <section class="slide bg-terra" data-slide="2">
+    <div class="top-id">Tio <em>Cumbana</em></div>
+    <div class="label accent">The problem</div>
+    <h1>Smallholder farmers are <em>excluded</em> from agronomy.</h1>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="num">500M</div>
+        <div class="lbl">farms globally</div>
+      </div>
+      <div class="stat">
+        <div class="num">2.5B</div>
+        <div class="lbl">people fed</div>
+      </div>
+      <div class="stat">
+        <div class="num">3.2M</div>
+        <div class="lbl">households in Mozambique</div>
+      </div>
+      <div class="stat">
+        <div class="num">40 km</div>
+        <div class="lbl">to my nearest agronomist</div>
+      </div>
+    </div>
+    <div class="nav">2 · problem</div>
+  </section>
+
+  <!-- Slide 3: Solution -->
+  <section class="slide bg-sisal" data-slide="3">
+    <div class="top-id">Tio <em>Cumbana</em></div>
+    <div class="label">The solution</div>
+    <h1>Most AI waits to be asked. Tio <em>Cumbana</em> doesn't.</h1>
+    <div class="bullets">
+      <div class="bullet"><div class="n">1</div><div class="t"><em>Watches</em> each parcel — long-running Managed Agent.</div></div>
+      <div class="bullet"><div class="n">2</div><div class="t"><em>Remembers</em> each farmer — Memory per phone.</div></div>
+      <div class="bullet"><div class="n">3</div><div class="t"><em>Speaks</em> Portuguese with Changana code-switch.</div></div>
+      <div class="bullet"><div class="n">4</div><div class="t">Gets <em>smarter</em> as more farmers contribute.</div></div>
+    </div>
+    <div class="nav">3 · solution</div>
+  </section>
+
+  <!-- Slide 4: Value chain -->
+  <section class="slide bg-sisal" data-slide="4">
+    <div class="top-id">Tio <em>Cumbana</em></div>
+    <div class="label">Across the value chain</div>
+    <h1 style="font-size: clamp(36px, 5vw, 64px); margin-bottom: 8px;">Not just farmers — <em>everyone</em> in the chain.</h1>
+    <div class="chain">
+      <div class="actor">
+        <div class="stage">Pre-production</div>
+        <div class="who"><em>Farmer</em> deciding what to plant</div>
+        <div class="gets">Memory + market signals advise the cycle's crop.</div>
+      </div>
+      <div class="actor">
+        <div class="stage">Production</div>
+        <div class="who"><em>Farmer</em> growing the crop</div>
+        <div class="gets">Vigilance loop — weather, disease, dosages, suppliers.</div>
+      </div>
+      <div class="actor">
+        <div class="stage">Wholesale</div>
+        <div class="who"><em>Market trader</em> at Zimpeto</div>
+        <div class="gets">Live demand signal from farmers about to ship.</div>
+      </div>
+      <div class="actor">
+        <div class="stage">Buying</div>
+        <div class="who"><em>Buyer</em> in the city</div>
+        <div class="gets">Confirmed price ranges before walking the market.</div>
+      </div>
+      <div class="actor">
+        <div class="stage">Retail</div>
+        <div class="who"><em>Supermarket</em></div>
+        <div class="gets">Harvest pipeline visibility · pre-purchase contracts · less waste.</div>
+      </div>
+      <div class="actor">
+        <div class="stage">Shelf</div>
+        <div class="who"><em>Consumer</em></div>
+        <div class="gets">QR-origin label → the farmer's profile and history.</div>
+      </div>
+      <div class="chain-band">
+        One unified <em>Memory</em> per farmer · cents per day on Opus 4.7 · only viable now.
+      </div>
+    </div>
+    <div class="nav">4 · value chain</div>
+  </section>
+
+  <!-- Slide 5: Architecture -->
+  <section class="slide bg-sisal" data-slide="5">
+    <div class="top-id">Tio <em>Cumbana</em></div>
+    <div class="label">Architecture</div>
+    <h1 style="font-size: clamp(36px, 5vw, 64px); margin-bottom: 8px;">Built end-to-end with <em>Claude Code</em>.</h1>
+    <div class="arch">
+      <div class="box span5 solid">
+        <div class="head">Farmer (Maluana)</div>
+        <div class="body">photo + voice note · phone number · web UI on Amplify</div>
+      </div>
+      <div class="arrow-row">↓</div>
+
+      <div class="box span2">
+        <div class="head">Memory layer</div>
+        <div class="body">Per-farmer profile: crops, planting dates, preferences, history</div>
+      </div>
+      <div class="box span3">
+        <div class="head">Opus 4.7 — multimodal</div>
+        <div class="body">image + voice transcript + memory → <em>Tio Cumbana</em> response</div>
+      </div>
+
+      <div class="box span2">
+        <div class="head">2 MCP servers</div>
+        <div class="body">weather (Open-Meteo) · Zimpeto price pool</div>
+      </div>
+      <div class="box span3">
+        <div class="head">Managed Agent — vigilance loop</div>
+        <div class="body">one per farmer · cross-references state · decides when to interrupt · invokes the <em>diagnose-mildew</em> Skill</div>
+      </div>
+
+      <div class="arrow-row">↓ &nbsp;&nbsp;&nbsp; ElevenLabs TTS &nbsp;&nbsp;&nbsp; ↓</div>
+
+      <div class="box span5 solid">
+        <div class="head">Voice note back to the farmer</div>
+        <div class="body">Portuguese with Changana code-switching · web UI today · WhatsApp roadmap</div>
+      </div>
+    </div>
+    <div class="nav">5 · architecture</div>
+  </section>
+
+  <!-- Slide 6: Demo transition -->
+  <section class="slide bg-verde" data-slide="6">
+    <div class="top-id">Tio <em>Cumbana</em></div>
+    <div class="label accent">Demo</div>
+    <h1>Photo + voice → <em>Opus 4.7</em> → voice note.</h1>
+    <div class="tagline" style="margin-top: 24px; opacity: 0.8;">Live, on a real farm in Maluana</div>
+    <div class="nav">6 · demo</div>
+  </section>
+
+  <!-- Slide 7: Closing -->
+  <section class="slide bg-terra" data-slide="7">
+    <div class="closer">
+      In Maluana they call me Tio <em>Cumbana</em> because I'm the one who understands plants.
+      <br><br>
+      Now Tio <em>Cumbana</em> doesn't need to be there — and never leaves.
+    </div>
+    <div class="nav">7 · close</div>
+  </section>
+
+</div>
+
+<script>
+  let i = 1;
+  const slides = document.querySelectorAll('.slide');
+  function go(n) {
+    slides.forEach(s => s.classList.remove('active'));
+    i = Math.max(1, Math.min(slides.length, n));
+    document.querySelector(`[data-slide="${i}"]`).classList.add('active');
+  }
+  document.addEventListener('keydown', (e) => {
+    if (['ArrowRight', 'ArrowDown', ' ', 'Enter'].includes(e.key)) go(i + 1);
+    if (['ArrowLeft', 'ArrowUp', 'Backspace'].includes(e.key)) go(i - 1);
+    if (e.key >= '1' && e.key <= '7') go(parseInt(e.key));
+    if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen();
+  });
+</script>
+</body>
+</html>

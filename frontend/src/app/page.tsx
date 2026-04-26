@@ -149,12 +149,20 @@ export default function Home() {
             Agronomia relacional
           </p>
         </div>
-        <Link
-          href="/market"
-          className="text-[11px] uppercase tracking-[0.2em] text-terracota hover:underline"
-        >
-          Mercado →
-        </Link>
+        <div className="flex flex-col items-end gap-1">
+          <Link
+            href="/market"
+            className="text-[11px] uppercase tracking-[0.2em] text-terracota hover:underline"
+          >
+            Mercado →
+          </Link>
+          <Link
+            href="/retail"
+            className="text-[11px] uppercase tracking-[0.2em] text-verde-capim hover:underline"
+          >
+            Retail →
+          </Link>
+        </div>
       </header>
 
       <section className="px-5 py-4">
