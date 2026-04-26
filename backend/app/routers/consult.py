@@ -18,7 +18,7 @@ from app.services.anthropic_client import TioCumbanaLLM
 from app.services.farmer_context import load_farmer
 from app.services.managed_agent import TioCumbanaManagedAgent
 from app.services.stt import ElevenLabsScribe
-from app.services.tts import ElevenLabsTTS
+from app.services.tts import ElevenLabsTTS, TTSError
 from app.services.whatsapp import TwilioWhatsApp, WhatsAppError
 
 router = APIRouter(prefix="/api", tags=["consult"])
@@ -66,8 +66,11 @@ async def consult(
 
     audio_b64: str | None = None
     if settings.elevenlabs_voice_id:
-        audio_bytes_out, _mime = await _tts(settings).synthesize(text)
-        audio_b64 = base64.b64encode(audio_bytes_out).decode()
+        try:
+            audio_bytes_out, _mime = await _tts(settings).synthesize(text)
+            audio_b64 = base64.b64encode(audio_bytes_out).decode()
+        except TTSError as e:
+            log.warning("consult.tts_skipped", error=str(e))
     else:
         log.warning("tts.skipped", reason="ELEVENLABS_VOICE_ID not set")
 
@@ -108,8 +111,11 @@ async def proactive(
     audio_bytes_out: bytes | None = None
     audio_mime = "audio/mpeg"
     if settings.elevenlabs_voice_id:
-        audio_bytes_out, audio_mime = await _tts(settings).synthesize(text)
-        audio_b64 = base64.b64encode(audio_bytes_out).decode()
+        try:
+            audio_bytes_out, audio_mime = await _tts(settings).synthesize(text)
+            audio_b64 = base64.b64encode(audio_bytes_out).decode()
+        except TTSError as e:
+            log.warning("proactive.tts_skipped", error=str(e))
 
     # Send via WhatsApp if Twilio is configured. The voice note is hosted
     # on this same backend at /api/audio/<id> with a 10-min TTL, so Twilio
